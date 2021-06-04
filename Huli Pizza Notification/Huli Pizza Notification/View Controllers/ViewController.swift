@@ -17,10 +17,30 @@ class ViewController: UIViewController {
     var counter = 0
    
     @IBAction func schedulePizza(_ sender: UIButton) {
+        UNUserNotificationCenter.current().getNotificationSettings { (settings) in
+            let status = settings.authorizationStatus
+            if status == .denied || status == .notDetermined{
+                DispatchQueue.main.async {
+                    self.accessDeniedAlert()
+                }
+                return
+            }
+            self.introNotification()
+        }
     }
     
     
     @IBAction func makePizza(_ sender: UIButton) {
+        UNUserNotificationCenter.current().getNotificationSettings { (settings) in
+            let status = settings.authorizationStatus
+            if status == .denied || status == .notDetermined{
+                DispatchQueue.main.async {
+                    self.accessDeniedAlert()
+                }
+                return
+            }
+            self.introNotification()
+        }
     }
     
     
