@@ -25,7 +25,20 @@ class ViewController: UIViewController {
                 }
                 return
             }
-            self.introNotification()
+          //  self.introNotification()
+            let content = UNMutableNotificationContent()
+            content.title = "A Scheduled Pizza"
+            content.body = "Time to make a Pizza!"
+            
+            var dateComponents = Calendar.current.dateComponents([.hour, .minute, .second], from: Date())
+            
+            dateComponents.second = dateComponents.second! + 15
+            
+            let trigger = UNCalendarNotificationTrigger(dateMatching: dateComponents, repeats: false)
+            
+            let identirfier = "message.scheduled"
+            
+            self.addNotifications(trigger: trigger, content: content, identifier: identirfier)
         }
     }
     
@@ -39,10 +52,32 @@ class ViewController: UIViewController {
                 }
                 return
             }
-            self.introNotification()
+         //   self.introNotification()
+            let content = self.notificationContent(title: "A timed pizza step", body: "Making pizza!!!")
+            let trigger = UNTimeIntervalNotificationTrigger(timeInterval: 10.0, repeats: false)
+            
+            let identirfier = "message.pizza"
+            
+            self.addNotifications(trigger: trigger, content: content, identifier: identirfier)
         }
     }
     
+    func addNotifications(trigger:UNNotificationTrigger, content: UNMutableNotificationContent, identifier:String){
+        let request = UNNotificationRequest(identifier: identifier, content: content, trigger: trigger)
+        UNUserNotificationCenter.current().add(request) { (error) in
+            self.printError(error, location: "addNotifications \(identifier)")
+        }
+    }
+    
+    func notificationContent(title:String, body:String)-> UNMutableNotificationContent{
+        let content = UNMutableNotificationContent()
+        content.title = title
+        content.body = body
+        
+        content.userInfo = ["step":0]
+        
+        return content
+    }
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -69,11 +104,13 @@ class ViewController: UIViewController {
         notifcationContent.title = "Hello, Pizza!!"
         notifcationContent.body = "Just a message to test permissions \(counter)"
         notifcationContent.badge = counter as NSNumber
+        
         //Trigger
         let trigger = UNTimeIntervalNotificationTrigger(timeInterval: time, repeats: false)
         
         //Request
         let request = UNNotificationRequest(identifier: "intro", content: notifcationContent, trigger: trigger)
+        
         //Schedule
         UNUserNotificationCenter.current().add(request) { (error) in
             self.printError(error, location: "Add introNotification")
