@@ -7,6 +7,8 @@
 //
 
 import UIKit
+import UserNotifications
+
 
 class ManageNotificationsViewController: UIViewController{
     
