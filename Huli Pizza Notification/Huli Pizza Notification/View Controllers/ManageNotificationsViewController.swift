@@ -23,10 +23,18 @@ class ManageNotificationsViewController: UIViewController{
     }
     
     @IBAction func viewPendingNotifications(_ sender: UIButton) {
-        
+        UNUserNotificationCenter.current().getPendingNotificationRequests { (requests) in
+            self.printRequest(count: requests.count, type: "pending")
+            for request in requests{
+                self.printConsoleView("-->\(request.identifier): \(request.content.body) \n")
+            }
+        }
     }
     
     @IBAction func viewDeliveredNotifications(_ sender: UIButton) {
+        UNUserNotificationCenter.current().getDeliveredNotifications { (re) in
+            <#code#>
+        }
        
     }
     
