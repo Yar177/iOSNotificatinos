@@ -32,8 +32,11 @@ class ManageNotificationsViewController: UIViewController{
     }
     
     @IBAction func viewDeliveredNotifications(_ sender: UIButton) {
-        UNUserNotificationCenter.current().getDeliveredNotifications { (re) in
-            <#code#>
+        UNUserNotificationCenter.current().getDeliveredNotifications { (notifications) in
+            self.printRequest(count: notifications.count, type: "Delivered")
+            for notification in notifications{
+                self.printConsoleView("-->\(notification.request.identifier): \(notification.request.content.body) \n")
+            }
         }
        
     }
@@ -47,7 +50,32 @@ class ManageNotificationsViewController: UIViewController{
     }
     
     @IBAction func nextPizzaStep(_ sender: UIButton) {
+        UNUserNotificationCenter.current().getPendingNotificationRequests { (requests) in
+            for request in requests{
+                if request.identifier.hasPrefix("message.pizza"){
+                    guard let content = self.updatePizzaContent(request: request) else{
+                        UNUserNotificationCenter.current().removePendingNotificationRequests(withIdentifiers: [request.identifier])
+                        return
+                    }
+                    self.addNotification(trigger: request.trigger, content: content, identifier: request.identifier)
+                    return
+                }
+            }
+        }
         
+    }
+    
+    func updatePizzaContent(request:UNNotificationRequest) -> UNMutableNotificationContent!{
+        if let stepNum = request.content.userInfo["step"] as? Int {
+            let newStepNum = (stepNum + 1)
+            if newStepNum >= pizzaSteps.count{return nil}
+            
+            let updatedContent = request.content.mutableCopy() as! UNMutableNotificationContent
+            updatedContent.body = pizzaSteps[newStepNum]
+            updatedContent.userInfo["step"] = newStepNum
+            return updatedContent
+        }
+        return request.content as? UNMutableNotificationContent
     }
     
     //MARK: - Life Cycle
